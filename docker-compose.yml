@@ -1,0 +1,61 @@
+
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest_app
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+    restart: always
+    depends_on:
+      - database
+    volumes:
+      - ./prisma:/app/prisma
+      - ./src:/app/src
+
+  nginx:
+    image: nginx:latest
+    container_name: ads-bot-nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/html:/usr/share/nginx/html
+    depends_on:
+      - app
+
+  database:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    volumes:
+      - minio_data:/data
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    command: server --console-address ":9001" /data
+
+volumes:
+  db_data:
+  minio_data:
