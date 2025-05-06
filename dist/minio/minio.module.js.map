@@ -1,0 +1,1 @@
+{"version":3,"file":"minio.module.js","sourceRoot":"","sources":["../../src/minio/minio.module.ts"],"names":[],"mappings":";;;;;;;;;AAAA,2CAAgD;AAChD,mDAA+C;AAE/C,MAAM,SAAS,GAAE;IACb,4BAAY;CACf,CAAA;AAMM,IAAM,WAAW,GAAjB,MAAM,WAAW;CAAI,CAAA;AAAf,kCAAW;sBAAX,WAAW;IALvB,IAAA,eAAM,GAAE;IACR,IAAA,eAAM,EAAC;QACJ,SAAS;QACT,OAAO,EAAE,SAAS;KACrB,CAAC;GACW,WAAW,CAAI"}

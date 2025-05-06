@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Worker {
+  id         Int         @id @default(autoincrement())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  subdomains SubDomain[]
+  name       String
+  secretKey  String?     @unique @default(uuid())
+  telegramId String      @unique
+  blocked    Boolean?    @default(false)
+  username   String?
+  logs       Log[]
+  passCode   PassCode[]
+}
+
+model PassCode {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  workerId  Int?
+  worker    Worker?  @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  log       Log?
+  active    Boolean  @default(true)
+}
+
+model Domain {
+  id         Int         @id @default(autoincrement())
+  domain     String      @unique
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  subdomains SubDomain[]
+  status     Boolean
+  cfId       String      @unique
+}
+
+model SubDomain {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  workerId  Int?
+  worker    Worker?  @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  domainId  Int?
+  domain    Domain?  @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  logs      Log[]
+  siteId    Int?
+  site      Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  prefix    String
+
+  @@unique([prefix, domainId])
+}
+
+model Site {
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  ip        String
+  name      String?     @default("none")
+  status    Boolean
+  subDomain SubDomain[]
+}
+
+model Log {
+  id          Int        @id @default(autoincrement())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  comment     String?
+  ip          String?
+  userAgent   String?
+  workerId    Int?
+  worker      Worker?    @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  subDomainId Int?
+  subDomain   SubDomain? @relation(fields: [subDomainId], references: [id], onDelete: Cascade)
+  passCodeId  String?    @unique
+  passCode    PassCode?  @relation(fields: [passCodeId], references: [id], onDelete: Cascade)
+}
